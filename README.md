@@ -1,7 +1,3 @@
-Certainly! If you're using Rust for your Advent of Code solutions, you can modify the README accordingly. Here's an example template for a Rust project:
-
----
-
 # Advent of Code Challenge Submissions in Rust
 
 ![Advent of Code Logo](https://adventofcode.com/favicon.png)
