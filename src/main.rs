@@ -1,7 +1,6 @@
 use clap::{command, Arg};
 
 fn main() {
-    println!("Hello, world!");
     println!("This is advent of code 2023!");
 
     let matches = command!()
@@ -21,6 +20,10 @@ fn main() {
         vec![
             advent_of_code::days::day_3::task_1::run,
             advent_of_code::days::day_3::task_2::run,
+        ],
+        vec![
+            advent_of_code::days::day_4::task_1::run,
+            advent_of_code::days::day_4::task_2::run,
         ],
     ];
 
