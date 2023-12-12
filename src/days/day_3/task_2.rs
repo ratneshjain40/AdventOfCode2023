@@ -1,10 +1,67 @@
-use std::{fs::read_to_string, usize};
+use std::{collections::HashMap, fs::read_to_string, usize};
 
+#[derive(Debug)]
 struct Data {
-    symbols: Vec<(char, Coord)>,
-    numbers: Vec<(String, Vec<Coord>)>,
+    max_row: usize,
+    symbols: HashMap<RowNumber, Vec<(char, Coord)>>,
+    numbers: HashMap<RowNumber, Vec<(String, Vec<Coord>)>>,
 }
 
+impl Data {
+    fn get_nearby_numbers(&self, row_number: RowNumber) -> Vec<(String, Vec<Coord>)> {
+        let mut nearby_numbers = Vec::new();
+
+        if row_number > 0 {
+            if let Some(numbers) = self.numbers.get(&(row_number - 1)) {
+                for number in numbers {
+                    nearby_numbers.push(number.clone());
+                }
+            }
+        }
+
+        if row_number < self.max_row {
+            if let Some(numbers) = self.numbers.get(&(row_number + 1)) {
+                for number in numbers {
+                    nearby_numbers.push(number.clone());
+                }
+            }
+        }
+
+        if row_number > 0 || row_number < self.max_row {
+            if let Some(numbers) = self.numbers.get(&row_number) {
+                for number in numbers {
+                    nearby_numbers.push(number.clone());
+                }
+            }
+        }
+
+        nearby_numbers
+    }
+
+    fn get_adj_num_to_symbol(&self, row_number: RowNumber, index: usize) -> Vec<usize> {
+        let nums = self.get_nearby_numbers(row_number);
+        let symbol = self.symbols.get(&row_number).unwrap()[index];
+        let adj_nums: Vec<usize> = nums
+            .iter()
+            .map(|(num, coords)| {
+                let min_distance = coords
+                    .iter()
+                    .map(|coord| chebyshev_distance(*coord, symbol.1))
+                    .min()
+                    .unwrap();
+                if min_distance == 1 {
+                    Some(num.parse::<usize>().unwrap())
+                } else {
+                    None
+                }
+            })
+            .filter_map(|x| x)
+            .collect();
+        return adj_nums;
+    }
+}
+
+type RowNumber = usize;
 type Coord = (usize, usize);
 
 fn read_input(filepath: &str) -> Vec<String> {
@@ -23,8 +80,9 @@ fn chebyshev_distance(coord_1: Coord, coord_2: Coord) -> usize {
 
 fn parse_input(lines: Vec<String>) -> Data {
     let mut data: Data = Data {
-        symbols: Vec::new(),
-        numbers: Vec::new(),
+        max_row: lines.len() - 1,
+        symbols: HashMap::new(),
+        numbers: HashMap::new(),
     };
 
     let mut num: (String, Vec<Coord>) = (String::new(), Vec::new());
@@ -37,16 +95,16 @@ fn parse_input(lines: Vec<String>) -> Data {
                 }
                 '.' => {
                     if num.0.len() > 0 {
-                        data.numbers.push(num.clone());
+                        data.numbers.entry(y).or_insert(vec![]).push(num.clone());
                     }
                     num.0.clear();
                     num.1.clear();
                 }
                 _ => {
                     if num.0.len() > 0 {
-                        data.numbers.push(num.clone());
+                        data.numbers.entry(y).or_insert(vec![]).push(num.clone());
                     }
-                    data.symbols.push((c, (x, y)));
+                    data.symbols.entry(y).or_insert(vec![]).push((c, (x, y)));
                     num.0.clear();
                     num.1.clear();
                 }
@@ -56,33 +114,28 @@ fn parse_input(lines: Vec<String>) -> Data {
     return data;
 }
 
-fn find_adj(data: Data) -> Vec<usize> {
-    let mut num_adj_to_symbol: Vec<usize> = Vec::new();
-    for num in &data.numbers {
-        let symbols = &data.symbols;
-        for symbol in symbols {
-            let min_distance = num
-                .1
-                .iter()
-                .map(|coord| chebyshev_distance(*coord, symbol.1))
-                .min()
-                .unwrap();
-            if min_distance == 1 {
-                num_adj_to_symbol.push(num.0.parse::<usize>().unwrap());
-            };
+fn get_gear_ratios(data: Data) -> Vec<usize> {
+    let mut gear_ratios = Vec::new();
+
+    for (row_number, symbols) in &data.symbols {
+        for (index, (symbol, _)) in symbols.iter().enumerate() {
+            if symbol == &'*' {
+                let adj_nums = data.get_adj_num_to_symbol(*row_number, index);
+                if adj_nums.len() == 2 {
+                    gear_ratios.push(adj_nums.iter().product());
+                }
+            }
         }
     }
-    num_adj_to_symbol
+
+    gear_ratios
 }
 
 pub fn run(filename: &str) -> usize {
     let input = read_input(format!("src/days/day_3/{}", filename).as_str());
     let grid = parse_input(input);
 
-    let adj_nums = find_adj(grid);
-    let mut sorted_adj_nums = adj_nums.clone();
-    sorted_adj_nums.sort();
-    println!("{:?}", sorted_adj_nums);
+    let adj_nums = get_gear_ratios(grid);
     return adj_nums.iter().sum();
 }
 
@@ -92,6 +145,6 @@ mod tests {
 
     #[test]
     fn test_run() {
-        assert_eq!(run("input_test.txt"), 4361);
+        assert_eq!(run("input_test.txt"), 467835);
     }
 }

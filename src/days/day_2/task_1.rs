@@ -58,7 +58,7 @@ fn is_game_possible(game_info: &GameInfo, cubes_in_bag: &Cubes) -> bool {
     return true;
 }
 
-pub fn run(filename: &str) -> u32 {
+pub fn run(filename: &str) -> usize {
     let game_info = read_input(format!("src/days/day_2/{}", filename).as_str());
     let cube_in_bag = Cubes::from([
         ("red".to_owned(), 12),
@@ -71,7 +71,7 @@ pub fn run(filename: &str) -> u32 {
             possible_games_sum += game.game_id;
         }
     }
-    return possible_games_sum;
+    return possible_games_sum as usize;
 }
 
 

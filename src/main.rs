@@ -1,19 +1,52 @@
+use clap::{command, Arg};
+
 fn main() {
     println!("Hello, world!");
     println!("This is advent of code 2023!");
 
-    // let res_day_1_task_1 = advent_of_code::days::day_1::task_1::run("input.txt");
-    // println!("Result: {}", res_day_1_task_1);
-    // let res_day_1_task_2 = advent_of_code::days::day_1::task_2::run("input.txt");
-    // println!("Result: {}", res_day_1_task_2);
+    let matches = command!()
+        .arg(Arg::new("day").short('d').long("day"))
+        .arg(Arg::new("task").short('t').long("task"))
+        .get_matches();
 
-    // let res_day_2_task_1 = advent_of_code::days::day_2::task_1::run("input.txt");
-    // println!("Result: {}", res_day_2_task_1);
-    // let res_day_2_task_2 = advent_of_code::days::day_2::task_2::run("input.txt");
-    // println!("Result: {}", res_day_2_task_2);
+    let registered = vec![
+        vec![
+            advent_of_code::days::day_1::task_1::run,
+            advent_of_code::days::day_1::task_2::run,
+        ],
+        vec![
+            advent_of_code::days::day_2::task_1::run,
+            advent_of_code::days::day_2::task_2::run,
+        ],
+        vec![
+            advent_of_code::days::day_3::task_1::run,
+            advent_of_code::days::day_3::task_2::run,
+        ],
+    ];
 
-    let res_day_3_task_1 = advent_of_code::days::day_3::task_1::run("input.txt");
-    println!("Result: {}", res_day_3_task_1);
-    // let res_day_3_task_2 = advent_of_code::days::day_3::task_2::run("input.txt");
-    // println!("Result: {}", res_day_3_task_2);
+    let day = matches.get_one::<String>("day");
+    let task = matches.get_one::<String>("task");
+
+    match (day, task) {
+        (Some(day), Some(task)) => {
+            let day = day.parse::<usize>().unwrap();
+            let task = task.parse::<usize>().unwrap();
+            let res = registered[day - 1][task - 1]("input.txt");
+            println!("Result: {}", res);
+        }
+
+        (Some(day), None) => {
+            let day = day.parse::<usize>().unwrap();
+            let last_task = registered[day - 1].len() - 1;
+            let res = registered[day - 1][last_task]("input.txt");
+            println!("Result: {}", res);
+        }
+
+        _ => {
+            let last_day = registered.len() - 1;
+            let last_task = registered[last_day].len() - 1;
+            let res = registered[last_day][last_task](&format!("input.txt"));
+            println!("Result: {}", res);
+        }
+    }
 }

@@ -80,9 +80,6 @@ pub fn run(filename: &str) -> usize {
     let grid = parse_input(input);
 
     let adj_nums = find_adj(grid);
-    let mut sorted_adj_nums = adj_nums.clone();
-    sorted_adj_nums.sort();
-    println!("{:?}", sorted_adj_nums);
     return adj_nums.iter().sum();
 }
 

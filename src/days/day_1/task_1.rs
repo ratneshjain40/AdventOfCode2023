@@ -8,7 +8,7 @@ fn read_input(filepath: &str) -> Vec<String> {
         .collect()
 }
 
-pub fn run(filename: &str) -> u32 {
+pub fn run(filename: &str) -> usize {
     let blocks = read_input(format!("src/days/day_1/{}", filename).as_str());
 
     let mut pairs: Vec<(u32, u32)> = Vec::new();
@@ -30,5 +30,5 @@ pub fn run(filename: &str) -> u32 {
         .collect();
 
     let sum: u32 = digits.iter().sum();
-    sum
+    sum as usize
 }

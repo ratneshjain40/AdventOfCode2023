@@ -58,14 +58,14 @@ fn min_max_cubes_needed(game_info: &GameInfo) -> Cubes {
     return min_max_cubes;
 }
 
-pub fn run(filename: &str) -> u32 {
+pub fn run(filename: &str) -> usize {
     let game_info = read_input(format!("src/days/day_2/{}", filename).as_str());
     let mut sum = 0;
     for game in &game_info {
         let min_max_cubes = min_max_cubes_needed(game);
         sum += min_max_cubes.values().product::<u32>();
     }
-    return sum;
+    return sum as usize;
 }
 
 #[cfg(test)]
