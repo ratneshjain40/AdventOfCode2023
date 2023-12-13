@@ -1,5 +1,3 @@
-use indicatif::ParallelProgressIterator;
-use rayon::prelude::*;
 use std::{fs::read_to_string, ops::Range};
 
 #[derive(Debug, Clone)]
@@ -11,16 +9,9 @@ struct Entry {
 impl Entry {
     pub fn new(source: usize, destination: usize, range: usize) -> Self {
         Self {
-            source: source..source + range,
-            destination: destination..destination + range,
+            source: source..source + range - 1,
+            destination: destination..destination + range - 1,
         }
-    }
-
-    pub fn get_destination(&self, source: usize) -> Option<usize> {
-        if self.source.contains(&source) {
-            return Some(self.destination.start + (source - self.source.start));
-        }
-        return None;
     }
 }
 
@@ -44,13 +35,88 @@ impl Map {
         self.entries.push(Entry::new(source, destination, range));
     }
 
-    pub fn get_destination(&self, source: usize) -> usize {
-        for entry in &self.entries {
-            if let Some(destination) = entry.get_destination(source) {
-                return destination;
+    fn sort_by_source(&mut self) {
+        self.entries
+            .sort_by(|a, b| a.source.start.cmp(&b.source.start));
+    }
+
+    pub fn fill_range_gaps(&mut self) {
+        self.sort_by_source();
+        let mut gaps: Vec<Entry> = Vec::new();
+        for i in 0..self.entries.len() - 2 {
+            let current = &self.entries[i];
+            let next = &self.entries[i + 1];
+            let gap = next.source.start - current.source.end;
+            if gap > 1 {
+                gaps.push(Entry::new(
+                    current.source.end + 1,
+                    current.source.end + 1,
+                    gap - 1,
+                ));
+                println!("{:?}", gaps);
             }
         }
-        return source;
+        self.entries.append(&mut gaps);
+        self.sort_by_source();
+    }
+
+    pub fn get_desination_ranges(&self, ranges: Vec<Range<usize>>) -> Vec<Range<usize>> {
+        let mut result: Vec<Range<usize>> = Vec::new();
+        for mut range in ranges {
+            let mut destination_ranges: Vec<Range<usize>> = Vec::new();
+
+            if range.start < self.entries[0].source.start
+                && range.end < self.entries[0].source.start
+                || range.start > self.entries[0].source.end
+                    && range.end > self.entries[0].source.end
+            {
+                destination_ranges.push(range.clone());
+                break;
+            }
+
+            if range.start < self.entries[0].source.start {
+                destination_ranges.push(range.start..self.entries[0].source.start - 1);
+                range.start = self.entries[0].source.start;
+            }
+
+            if range.end > self.entries[self.entries.len() - 1].source.end {
+                destination_ranges
+                    .push(self.entries[self.entries.len() - 1].source.end + 1..range.end);
+                range.end = self.entries[self.entries.len() - 1].source.end;
+            }
+
+            for (_, entry) in self.entries.iter().enumerate() {
+                if entry.source.contains(&range.start) && entry.source.contains(&range.end) {
+                    destination_ranges.push(
+                        entry.destination.start + (range.start - entry.source.start)
+                            ..entry.destination.start + (range.end - entry.source.start),
+                    );
+                    break;
+                }
+                if entry.source.contains(&range.start) {
+                    destination_ranges.push(
+                        entry.destination.start + (range.start - entry.source.start)
+                            ..entry.destination.end,
+                    );
+                    continue;
+                }
+                if entry.source.start > range.start && entry.source.end < range.end {
+                    destination_ranges.push(entry.destination.clone());
+                    continue;
+                }
+                if entry.source.contains(&range.end) {
+                    destination_ranges.push(
+                        entry.destination.start
+                            ..entry.destination.start + (range.end - entry.source.start),
+                    );
+                    break;
+                }
+            }
+
+            println!("{:?}", destination_ranges);
+            result.append(&mut destination_ranges);
+        }
+        return result;
     }
 }
 
@@ -77,6 +143,7 @@ fn parse_input(lines: Vec<String>) -> (Vec<Range<usize>>, Vec<Map>) {
         let line = &lines[line_index];
         if start_map && line == "" {
             start_map = false;
+            map.fill_range_gaps();
             maps.push(map.clone());
             map.clear();
         }
@@ -110,27 +177,19 @@ fn parse_input(lines: Vec<String>) -> (Vec<Range<usize>>, Vec<Map>) {
 pub fn run(filename: &str) -> usize {
     let lines = read_input(format!("src/days/day_5/{}", filename).as_str());
     let (seed_ranges, maps) = parse_input(lines);
-    let seeds = seed_ranges
-        .par_iter()
-        .progress()
-        .flat_map(|range| range.clone().collect::<Vec<usize>>())
-        .collect::<Vec<usize>>();
-
-    let locations = seeds
-        .par_iter()
-        .progress()
-        .map(|seed| {
-            let mut value = *seed;
+    let locations = seed_ranges
+        .iter()
+        .map(|seed_ranges| {
+            let mut value = vec![seed_ranges.clone()];
             for map in &maps {
-                value = map.get_destination(value);
+                value = map.get_desination_ranges(value);
             }
-            return value;
+
+            value.iter().map(|x| x.start).min().unwrap()
         })
         .collect::<Vec<usize>>();
 
-    let min_value = locations.par_iter().min().unwrap();
-
-    return *min_value;
+    return locations.iter().min().unwrap().clone();
 }
 
 #[cfg(test)]
@@ -139,7 +198,7 @@ mod tests {
 
     #[test]
     fn test_run() {
-        assert_eq!(run("input_test.txt"), 35);
+        assert_eq!(run("input_test.txt"), 46);
     }
 
     #[test]
