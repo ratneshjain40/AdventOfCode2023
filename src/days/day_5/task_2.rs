@@ -1,3 +1,5 @@
+use indicatif::ParallelProgressIterator;
+use rayon::prelude::*;
 use std::{fs::read_to_string, ops::Range};
 
 #[derive(Debug, Clone)]
@@ -107,8 +109,28 @@ fn parse_input(lines: Vec<String>) -> (Vec<Range<usize>>, Vec<Map>) {
 
 pub fn run(filename: &str) -> usize {
     let lines = read_input(format!("src/days/day_5/{}", filename).as_str());
-    let (seeds, maps) = parse_input(lines);
-    todo!()
+    let (seed_ranges, maps) = parse_input(lines);
+    let seeds = seed_ranges
+        .par_iter()
+        .progress()
+        .flat_map(|range| range.clone().collect::<Vec<usize>>())
+        .collect::<Vec<usize>>();
+
+    let locations = seeds
+        .par_iter()
+        .progress()
+        .map(|seed| {
+            let mut value = *seed;
+            for map in &maps {
+                value = map.get_destination(value);
+            }
+            return value;
+        })
+        .collect::<Vec<usize>>();
+
+    let min_value = locations.par_iter().min().unwrap();
+
+    return *min_value;
 }
 
 #[cfg(test)]
