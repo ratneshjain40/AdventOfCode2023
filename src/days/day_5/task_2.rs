@@ -1,24 +1,22 @@
-use std::fs::read_to_string;
+use std::{fs::read_to_string, ops::Range};
 
 #[derive(Debug, Clone)]
 struct Entry {
-    pub source: usize,
-    pub destination: usize,
-    pub range: usize,
+    pub source: Range<usize>,
+    pub destination: Range<usize>,
 }
 
 impl Entry {
     pub fn new(source: usize, destination: usize, range: usize) -> Self {
         Self {
-            source,
-            destination,
-            range,
+            source: source..source + range,
+            destination: destination..destination + range,
         }
     }
 
     pub fn get_destination(&self, source: usize) -> Option<usize> {
-        if source >= self.source && source <= self.source + self.range {
-            return Some(self.destination + (source - self.source));
+        if self.source.contains(&source) {
+            return Some(self.destination.start + (source - self.source.start));
         }
         return None;
     }
@@ -62,7 +60,7 @@ fn read_input(filepath: &str) -> Vec<String> {
         .collect()
 }
 
-fn parse_input(lines: Vec<String>) -> (Vec<usize>, Vec<Map>) {
+fn parse_input(lines: Vec<String>) -> (Vec<Range<usize>>, Vec<Map>) {
     let mut maps: Vec<Map> = Vec::new();
 
     let raw_seeds = lines[0].split(" ").skip(1).collect::<Vec<&str>>();
@@ -99,24 +97,18 @@ fn parse_input(lines: Vec<String>) -> (Vec<usize>, Vec<Map>) {
         maps.push(map.clone());
     }
 
-    return (seeds, maps);
+    let mut seed_ranges = Vec::new();
+    for i in (0..seeds.len()).step_by(2) {
+        seed_ranges.push(seeds[i]..seeds[i] + seeds[i + 1]);
+    }
+
+    return (seed_ranges, maps);
 }
 
 pub fn run(filename: &str) -> usize {
     let lines = read_input(format!("src/days/day_5/{}", filename).as_str());
     let (seeds, maps) = parse_input(lines);
-    let min_value = seeds
-        .iter()
-        .map(|seed| {
-            let mut value = *seed;
-            for map in &maps {
-                value = map.get_destination(value);
-            }
-            return value;
-        })
-        .min()
-        .unwrap();
-    return min_value;
+    todo!()
 }
 
 #[cfg(test)]
