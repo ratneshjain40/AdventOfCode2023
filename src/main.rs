@@ -25,6 +25,10 @@ fn main() {
             advent_of_code::days::day_4::task_1::run,
             advent_of_code::days::day_4::task_2::run,
         ],
+        vec![
+            advent_of_code::days::day_5::task_1::run,
+            advent_of_code::days::day_5::task_2::run,
+        ],
     ];
 
     let day = matches.get_one::<String>("day");
@@ -35,6 +39,7 @@ fn main() {
             let day = day.parse::<usize>().unwrap();
             let task = task.parse::<usize>().unwrap();
             let res = registered[day - 1][task - 1]("input.txt");
+            println!("Day: {}, Task: {}...", day, task);
             println!("Result: {}", res);
         }
 
@@ -42,6 +47,7 @@ fn main() {
             let day = day.parse::<usize>().unwrap();
             let last_task = registered[day - 1].len() - 1;
             let res = registered[day - 1][last_task]("input.txt");
+            println!("Day: {}, Task: {}...", day, last_task + 1);
             println!("Result: {}", res);
         }
 
@@ -49,6 +55,7 @@ fn main() {
             let last_day = registered.len() - 1;
             let last_task = registered[last_day].len() - 1;
             let res = registered[last_day][last_task](&format!("input.txt"));
+            println!("Day: {}, Task: {}...", last_day + 1, last_task + 1);
             println!("Result: {}", res);
         }
     }

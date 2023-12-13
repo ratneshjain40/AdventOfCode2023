@@ -6,11 +6,14 @@ This repository contains my solutions to the [Advent of Code](https://adventofco
 
 ## Table of Contents
 
-- [About Advent of Code](#about-advent-of-code)
-- [Solutions](#solutions)
-- [Usage](#usage)
-- [Folder Structure](#folder-structure)
-- [License](#license)
+- [Advent of Code Challenge Submissions in Rust](#advent-of-code-challenge-submissions-in-rust)
+  - [Table of Contents](#table-of-contents)
+  - [About Advent of Code](#about-advent-of-code)
+  - [Solutions](#solutions)
+  - [Usage](#usage)
+  - [Folder Structure](#folder-structure)
+  - [License](#license)
+  - [Template](#template)
 
 ## About Advent of Code
 
@@ -53,3 +56,39 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ---
 
 Feel free to adapt this template to suit your preferences and the specifics of your Rust implementation. Good luck with your Rust Advent of Code submissions!
+
+## Template
+
+This is a template for the README file for each day's solution. Feel free to use it as a starting point for your own solutions.
+
+```rust
+use std::fs::read_to_string;
+
+fn read_input(filepath: &str) -> Vec<String> {
+    read_to_string(filepath)
+        .unwrap()
+        .lines()
+        .map(String::from)
+        .collect()
+}
+
+fn parse_input(lines: Vec<String>) -> Vec<String> {
+    todo!()
+}
+
+pub fn run(filename: &str) -> usize {
+    let lines = read_input(format!("src/days/day_X/{}", filename).as_str());
+    todo!()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_run() {
+        assert_eq!(run("input_test.txt"), 35);
+    }
+}
+
+```
