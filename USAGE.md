@@ -34,6 +34,18 @@ To run the program, use the following command:
 
 Replace `<executable_name>` with the name of the compiled executable.
 
+> **_NOTE:_**  if running from Cargo, use the following command:
+
+```bash
+cargo run --release -- [OPTIONS]
+```
+
+or simply:
+
+```bash
+cargo run -- [OPTIONS]
+```
+
 ## Command-Line Options
 The program supports the following command-line options:
 

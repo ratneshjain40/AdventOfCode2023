@@ -10,10 +10,10 @@ This repository contains my solutions to the [Advent of Code](https://adventofco
   - [Table of Contents](#table-of-contents)
   - [About Advent of Code](#about-advent-of-code)
   - [Solutions](#solutions)
+  - [Guide](#guide)
   - [Usage](#usage)
   - [Folder Structure](#folder-structure)
   - [License](#license)
-  - [Usage Guide](#usage-guide)
   - [Template](#template)
 
 ## About Advent of Code
@@ -26,8 +26,10 @@ For more information, visit [Advent of Code](https://adventofcode.com/).
 
 This repository contains my solutions to the Advent of Code challenges, implemented in Rust. Each day's solution is organized in a separate folder with a dedicated README file explaining the problem and my approach to solving it.
 
-## Usage
+## Guide
+Link to the [Usage Guide](USAGE.md).
 
+## Usage
 To run any specific day's solution, navigate to the respective folder and follow the instructions provided in the README file.
 
 ```bash
@@ -57,9 +59,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ---
 
 Feel free to adapt this template to suit your preferences and the specifics of your Rust implementation. Good luck with your Rust Advent of Code submissions!
-
-## Usage Guide
-Link to the [Usage Guide](USAGE.md).
 
 ## Template
 
