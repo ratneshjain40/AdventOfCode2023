@@ -97,21 +97,6 @@ pub fn run(filename: &str) -> usize {
     let lines = read_input(format!("src/days/day_5/{}", filename).as_str());
     let (mut seed_ranges, blocks) = parse_input(lines);
 
-    // println!("Seed ranges:");
-    // for seed in seed_ranges.iter() {
-    //     println!("{} -> {}", seed.start, seed.end);
-    // }
-
-    // println!();
-    // println!("Blocks:");
-    // for (i, block) in blocks.iter().enumerate() {
-    //     println!();
-    //     println!("Block {}", i + 1);
-    //     for entry in block.entries.iter() {
-    //         println!("{} -> {}", entry.source.start, entry.destination.start);
-    //     }
-    // }
-
     for block in blocks {
         let mut new = Vec::new();
         while seed_ranges.len() > 0 {
