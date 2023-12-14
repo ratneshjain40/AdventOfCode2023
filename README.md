@@ -13,6 +13,7 @@ This repository contains my solutions to the [Advent of Code](https://adventofco
   - [Usage](#usage)
   - [Folder Structure](#folder-structure)
   - [License](#license)
+  - [Usage Guide](#usage-guide)
   - [Template](#template)
 
 ## About Advent of Code
@@ -56,6 +57,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ---
 
 Feel free to adapt this template to suit your preferences and the specifics of your Rust implementation. Good luck with your Rust Advent of Code submissions!
+
+## Usage Guide
+Link to the [Usage Guide](USAGE.md).
 
 ## Template
 

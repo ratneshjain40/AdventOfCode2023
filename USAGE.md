@@ -72,6 +72,3 @@ This command will execute the solution for the last day and task available.
 - Input files are assumed to be named "input.txt" and should be present in the same directory as the executable.
 
 Now you are ready to explore and solve the Advent of Code challenges with this Rust program! Good luck!
-
-## Usage Guide
-Link to the [Usage Guide](USAGE.md).
