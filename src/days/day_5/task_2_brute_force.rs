@@ -1,8 +1,5 @@
-use std::{
-    cmp::{max, min},
-    fs::read_to_string,
-    ops::Range,
-};
+use rayon::prelude::*;
+use std::{fs::read_to_string, ops::Range};
 
 #[derive(Debug, Clone)]
 struct Entry {
@@ -13,9 +10,16 @@ struct Entry {
 impl Entry {
     pub fn new(source: usize, destination: usize, range: usize) -> Self {
         Self {
-            source: source..source + range - 1,
-            destination: destination..destination + range - 1,
+            source: source..source + range,
+            destination: destination..destination + range,
         }
+    }
+
+    pub fn get_destination(&self, source: usize) -> Option<usize> {
+        if self.source.contains(&source) {
+            return Some(self.destination.start + (source - self.source.start));
+        }
+        return None;
     }
 }
 
@@ -37,6 +41,15 @@ impl Map {
 
     pub fn insert(&mut self, source: usize, destination: usize, range: usize) {
         self.entries.push(Entry::new(source, destination, range));
+    }
+
+    pub fn get_destination(&self, source: usize) -> usize {
+        for entry in &self.entries {
+            if let Some(destination) = entry.get_destination(source) {
+                return destination;
+            }
+        }
+        return source;
     }
 }
 
@@ -87,7 +100,7 @@ fn parse_input(lines: Vec<String>) -> (Vec<Range<usize>>, Vec<Map>) {
 
     let mut seed_ranges = Vec::new();
     for i in (0..seeds.len()).step_by(2) {
-        seed_ranges.push(seeds[i]..seeds[i] + seeds[i + 1] - 1);
+        seed_ranges.push(seeds[i]..seeds[i] + seeds[i + 1]);
     }
 
     return (seed_ranges, maps);
@@ -95,40 +108,32 @@ fn parse_input(lines: Vec<String>) -> (Vec<Range<usize>>, Vec<Map>) {
 
 pub fn run(filename: &str) -> usize {
     let lines = read_input(format!("src/days/day_5/{}", filename).as_str());
-    let (mut seed_ranges, blocks) = parse_input(lines);
+    let (seed_ranges, maps) = parse_input(lines);
 
-    for block in blocks {
-        let mut new = Vec::new();
-        while seed_ranges.len() > 0 {
-            let seed = seed_ranges.pop().unwrap();
+    let multi_bar = indicatif::MultiProgress::new();
 
-            let mut flag = true;
-            for entry in block.entries.iter() {
-                let os = max(seed.start, entry.source.start);
-                let oe = min(seed.end, entry.source.end);
-                if os < oe {
-                    new.push(
-                        entry.destination.start + (os - entry.source.start)
-                            ..entry.destination.start + (oe - entry.source.start),
-                    );
-                    if os > seed.start {
-                        seed_ranges.push(seed.start..os);
+    let min_value = seed_ranges
+        .par_iter()
+        .map(|seeds| {
+            let bar = multi_bar.add(indicatif::ProgressBar::new(seeds.len() as u64));
+            let seeds = seeds.clone();
+            seeds
+                .into_par_iter()
+                .map(|seed| {
+                    bar.inc(1);
+                    let mut value = seed;
+                    for map in &maps {
+                        value = map.get_destination(value);
                     }
-                    if seed.end > oe {
-                        seed_ranges.push(oe..seed.end);
-                    }
-                    flag = false;
-                    break;
-                }
-            }
-            if flag {
-                new.push(seed);
-            }
-        }
-        seed_ranges = new;
-    }
-    let min_value = seed_ranges.iter().map(|seed| seed.start).min().unwrap();
-    return min_value;
+                    return value;
+                })
+                .min()
+                .unwrap()
+        })
+        .min()
+        .unwrap();
+
+    min_value
 }
 
 #[cfg(test)]
@@ -137,7 +142,7 @@ mod tests {
 
     #[test]
     fn test_run() {
-        assert_eq!(run("input_test.txt"), 46);
+        assert_eq!(run("input_test.txt"), 35);
     }
 
     #[test]
