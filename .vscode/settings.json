@@ -6,4 +6,5 @@
     "rust-analyzer.linkedProjects": [
         ".\\Cargo.toml"
     ],
+    "cloudcode.duetAI.inlineSuggestions.enableAuto": true,
 }
