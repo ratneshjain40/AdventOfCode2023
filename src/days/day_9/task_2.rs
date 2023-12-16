@@ -26,13 +26,10 @@ pub fn run(filename: &str) -> usize {
     let predictions = nums
         .into_iter()
         .map(|list| {
-            println!("\nList {:?}", list);
             let mut accumulator = vec![list[0]];
             let mut diffs: Vec<_> = list.windows(2).map(|pair| pair[1] - pair[0]).collect();
             while !diffs.iter().all(|diff| diff == &0) {
-                println!("Diffs {:?}", diffs);
                 accumulator.push(diffs[0]);
-                println!("Sub {:?} Accumulator {:?} ", diffs[0], accumulator);
                 diffs = diffs.windows(2).map(|pair| pair[1] - pair[0]).collect();
             }
 
@@ -41,7 +38,6 @@ pub fn run(filename: &str) -> usize {
             for i in 1..accumulator.len() {
                 value = accumulator[i] - value;
             }
-            println!("Value {:?}", value);
             return value;
         })
         .collect::<Vec<_>>();

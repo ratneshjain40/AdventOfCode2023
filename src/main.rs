@@ -43,7 +43,7 @@ fn main() {
         ],
         vec![
             advent_of_code::days::day_9::task_1::run,
-            // advent_of_code::days::day_9::task_2::run,
+            advent_of_code::days::day_9::task_2::run,
         ],
     ];
 
