@@ -25,13 +25,10 @@ pub fn run(filename: &str) -> usize {
 
     let mut predictions = Vec::new();
     for list in nums {
-        println!("\nList {:?}", list);
         let mut accumulator = list[list.len() - 1];
         let mut diffs: Vec<_> = list.windows(2).map(|pair| pair[1] - pair[0]).collect();
         while !diffs.iter().all(|diff| diff == &0) {
-            println!("{:?}", diffs);
             accumulator += diffs[diffs.len() - 1];
-            println!("addding {} to accumulator", diffs[diffs.len() - 1]);
             diffs = diffs.windows(2).map(|pair| pair[1] - pair[0]).collect();
         }
         predictions.push(accumulator);
