@@ -23,16 +23,18 @@ pub fn run(filename: &str) -> usize {
     let lines = read_input(format!("src/days/day_9/{}", filename).as_str());
     let nums = parse_input(lines);
 
-    let mut predictions = Vec::new();
-    for list in nums {
-        let mut accumulator = list[list.len() - 1];
-        let mut diffs: Vec<_> = list.windows(2).map(|pair| pair[1] - pair[0]).collect();
-        while !diffs.iter().all(|diff| diff == &0) {
-            accumulator += diffs[diffs.len() - 1];
-            diffs = diffs.windows(2).map(|pair| pair[1] - pair[0]).collect();
-        }
-        predictions.push(accumulator);
-    }
+    let predictions = nums
+        .into_iter()
+        .map(|list| {
+            let mut accumulator = list[list.len() - 1];
+            let mut diffs: Vec<_> = list.windows(2).map(|pair| pair[1] - pair[0]).collect();
+            while !diffs.iter().all(|diff| diff == &0) {
+                accumulator += diffs[diffs.len() - 1];
+                diffs = diffs.windows(2).map(|pair| pair[1] - pair[0]).collect();
+            }
+            return accumulator;
+        })
+        .collect::<Vec<_>>();
     let sum = predictions.iter().sum::<i128>();
     return sum as usize;
 }
