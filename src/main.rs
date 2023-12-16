@@ -41,6 +41,10 @@ fn main() {
             advent_of_code::days::day_8::task_1::run,
             advent_of_code::days::day_8::task_2::run,
         ],
+        vec![
+            advent_of_code::days::day_9::task_1::run,
+            // advent_of_code::days::day_9::task_2::run,
+        ],
     ];
 
     let day = matches.get_one::<String>("day");
